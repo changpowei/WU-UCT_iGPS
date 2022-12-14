@@ -1,0 +1,5 @@
+INFO:root:Start simulation
+INFO:root:> Time step 0, take action 1, instance reward 0.0, cumulative reward 0.0, used 11.44538126885891 seconds
+INFO:root:> Time step 1, take action 3, instance reward 0.0, cumulative reward 0.0, used 6.941463945433497 seconds
+INFO:root:> Time step 2, take action 4, instance reward 0.0, cumulative reward 0.0, used 7.161197301931679 seconds
+INFO:root:> Time step 3, take action 0, instance reward 0.0, cumulative reward 0.0, used 7.066394677851349 seconds

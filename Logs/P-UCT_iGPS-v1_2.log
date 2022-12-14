@@ -1,0 +1,17 @@
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:> Time step 0, take action 0, instance reward 0, cumulative reward 0.0, used 21016.79456816602 seconds
+INFO:root:> Time step 1, take action 0, instance reward 0, cumulative reward 0.0, used 31384.911858889973 seconds
+INFO:root:> Time step 2, take action 0, instance reward 0, cumulative reward 0.0, used 19335.327226553927 seconds
+INFO:root:> Time step 3, take action 0, instance reward 0, cumulative reward 0.0, used 22274.558408219018 seconds
+INFO:root:> Time step 4, take action 0, instance reward 0, cumulative reward 0.0, used 17741.670051403926 seconds
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:Start simulation
+INFO:root:> Time step 0, take action 0, instance reward 0, cumulative reward 0.0, used 28444.51576291304 seconds
+INFO:root:Start simulation
+INFO:root:> Time step 0, take action 0, instance reward 0, cumulative reward 0.0, used 38136.43761553685 seconds

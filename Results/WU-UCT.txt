@@ -1,0 +1,1 @@
+Model: WU-UCT, env: PongNoFrameskip-v0, result: 21.0, MCTS max steps: 200, policy: Random, worker num: 16Model: WU-UCT, env: PongNoFrameskip-v0, result: 21.0, MCTS max steps: 200, policy: Random, worker num: 16Model: WU-UCT, env: PongNoFrameskip-v0, result: 20.0, MCTS max steps: 500, policy: Random, worker num: 16
