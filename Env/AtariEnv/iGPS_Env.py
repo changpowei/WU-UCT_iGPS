@@ -31,13 +31,13 @@ class iGPS_Env(gym.Env):
 
         self.action_space = gym.spaces.Discrete((self.height * self.width) -1)
 
-        self.historical_action = np.zeros(4)
+        self.historical_action = np.zeros(self.BS_num)
         self.current_step_count = 0
 
 
 
     def reset(self):
-        self.historical_action = np.zeros(4)
+        self.historical_action = np.zeros(self.BS_num)
 
         state = np.zeros((self.BS_num + 1, self.height, self.width))
         state[0] = self.org_terrain

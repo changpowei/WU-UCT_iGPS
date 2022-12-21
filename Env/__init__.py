@@ -9,7 +9,7 @@ V0NAME = 'iGPS'
 parser.add_argument(
     "--BS_num",
     type=int,
-    default=4,
+    default=9,
 )
 
 parser.add_argument(

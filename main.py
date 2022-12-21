@@ -17,11 +17,11 @@ def main():
     parser.add_argument("--env-name", type = str, default = "iGPS-v1",
                         help = "Environment name (default: PongNoFrameskip-v0、iGPS-v1)")
 
-    parser.add_argument("--MCTS-max-steps", type = int, default = 500,
+    parser.add_argument("--MCTS-max-steps", type = int, default = 1000,
                         help = "Max simulation step of MCTS (default: 500、1000)")
     parser.add_argument("--MCTS-max-depth", type = int, default = 10,
                         help = "Max depth of MCTS simulation (default: 100、10)")
-    parser.add_argument("--MCTS-max-width", type = int, default = 20,
+    parser.add_argument("--MCTS-max-width", type = int, default = 200,
                         help = "Max width of MCTS simulation (default: 20、200)")
 
     parser.add_argument("--gamma", type = float, default = 0.99,
