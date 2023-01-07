@@ -27,9 +27,9 @@ def main():
     parser.add_argument("--gamma", type = float, default = 0.99,
                         help = "Discount factor (default: 1.0)")
 
-    parser.add_argument("--expansion-worker-num", type = int, default = 1,
+    parser.add_argument("--expansion-worker-num", type = int, default = 8,
                         help = "Number of expansion workers (default: 1)")
-    parser.add_argument("--simulation-worker-num", type = int, default = 2,
+    parser.add_argument("--simulation-worker-num", type = int, default = 8,
                         help = "Number of simulation workers (default: 16)")
 
     parser.add_argument("--seed", type = int, default = 124,

@@ -12,6 +12,8 @@ from ParallelPool.PoolManager import PoolManager
 
 from Mem.CheckpointManager import CheckpointManager
 
+from Policy.PolicyWrapper import PolicyWrapper
+
 
 class WU_UCT():
     def __init__(self, env_params, max_steps = 1000, max_depth = 20, max_width = 5,
@@ -123,7 +125,7 @@ class WU_UCT():
             state = next_state
             step_count += 1
 
-            if  done == True and reward < 0.9:
+            if  done == True and reward < 80:
                 done = False
                 state = self.wrapped_env.reset()
 
@@ -157,12 +159,19 @@ class WU_UCT():
 
         # Construct root node
         self.checkpoint_data_manager.checkpoint_env("main", self.global_saving_idx)
+
+        prior_prob = np.ones([self.action_n], dtype=np.float32) / np.count_nonzero(state[1] == 0)
+        base_loc = [index for index, number in enumerate(state[1].tolist()[0]) if number == 1]
+        for i in base_loc:
+            prior_prob[i] = 0
+
         self.root_node = WU_UCTnode(
             action_n = self.action_n,
             state = state,
             checkpoint_idx = self.global_saving_idx,
             parent = None,
             tree = self,
+            prior_prob = prior_prob,
             is_head = True
         )
 

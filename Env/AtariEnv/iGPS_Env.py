@@ -3,6 +3,7 @@ import pandas as pd
 from scipy.stats import stats
 import gym
 from copy import deepcopy
+from Coverage import Coverage
 
 import matlab.engine
 eng = matlab.engine.start_matlab()
@@ -13,23 +14,33 @@ class iGPS_Env(gym.Env):
         self.BS_num = config.BS_num
         self.height = config.height
         self.width = config.width
+
+        self.lat_min = config.lat_min
+        self.lat_max = config.lat_max
+        self.lon_min = config.lon_min
+        self.lon_max = config.lon_max
+        self.grid_step_size = config.grid_step_size
+
+        self.coverage_compute = Coverage(self.lat_min, self.lat_max, self.lon_min, self.lon_max, self.grid_step_size)
+
         self.DOP_thres = config.DOP_thres
         self.cov_thres = config.cov_thres
         self.dir_name = config.dir_name
 
         self._max_episode_steps = self.BS_num
 
-        self.grid_data = np.loadtxt("data/northern_position_highist12x14.txt", dtype='float', delimiter=',')
-        self.terrain_data = self.grid_data[:, 1].reshape(12, 14)
-        self.terrain_data = pd.DataFrame(self.terrain_data)
-        self.org_terrain = self.terrain_data.apply(stats.zscore).to_numpy()
+        self.grid_data = np.loadtxt("data/position_NCSIST.csv", dtype='float', delimiter=',')
+        self.terrain_data = self.grid_data[:, 0].reshape(self.height, self.width)
+        # self.terrain_data = pd.DataFrame(self.terrain_data)
+        # self.org_terrain = self.terrain_data.apply(stats.zscore).to_numpy()
 
-        self.frames = np.zeros((self.BS_num + 1, self.height, self.width))
-        self.frames[0] = self.org_terrain
+        # self.frames = np.zeros((self.BS_num + 1, self.height, self.width))
+        self.frames = np.zeros((2, self.height, self.width))
+        self.frames[0] = self.terrain_data
 
         self.env_type = None
 
-        self.action_space = gym.spaces.Discrete((self.height * self.width) -1)
+        self.action_space = gym.spaces.Discrete(self.height * self.width)
 
         self.historical_action = np.zeros(self.BS_num)
         self.current_step_count = 0
@@ -39,8 +50,9 @@ class iGPS_Env(gym.Env):
     def reset(self):
         self.historical_action = np.zeros(self.BS_num)
 
-        state = np.zeros((self.BS_num + 1, self.height, self.width))
-        state[0] = self.org_terrain
+        # state = np.zeros((self.BS_num + 1, self.height, self.width))
+        state = np.zeros((2, self.height, self.width))
+        state[0] = self.terrain_data
 
         self.frames = state
         self.current_step_count = 0
@@ -49,14 +61,22 @@ class iGPS_Env(gym.Env):
     def step(self, action):
         self.historical_action[self.current_step_count] = action
 
-        next_state = np.zeros((self.BS_num + 1, self.height, self.width))
-        next_state[0] = self.org_terrain
+        # next_state = np.zeros((self.BS_num + 1, self.height, self.width))
+        next_state = np.zeros((2, self.height, self.width))
+        next_state[0] = self.terrain_data
 
-        for i in range(0, self.current_step_count+1):
-            historical_state = np.zeros((self.height, self.width))
-            for j in range(0, i + 1):
-                historical_state[int(self.historical_action[j] // self.width), int(self.historical_action[j] % self.width)] = 1.0
-            next_state[i+1] = historical_state
+        # for i in range(0, self.current_step_count+1):
+        #     historical_state = np.zeros((self.height, self.width))
+        #     for j in range(0, i + 1):
+        #         historical_state[int((self.historical_action[j]) // self.width), int((self.historical_action[j]) % self.width)] = 1.0
+        #     next_state[i+1] = historical_state
+
+        historical_state = np.zeros((self.height, self.width))
+        for i in range(0, self.current_step_count + 1):
+            historical_state[
+                int((self.historical_action[i]) // self.width), int((self.historical_action[i]) % self.width)] = 1.0
+        next_state[1] = historical_state
+
 
         self.current_step_count += 1
         self.frames = next_state
@@ -87,17 +107,24 @@ class iGPS_Env(gym.Env):
             lats = matlab.double(lats.tolist())
             lons = matlab.double(lons.tolist())
             # calculate dilution of precision(DOP) and coverage rate
-            DOP_rate = eng.cal_DOP_northern(lats, lons, nargout=1)
+            DOP_rate = eng.cal_DOP_NCSIST(lats, lons, self.lat_min, self.lat_max, self.lon_min, self.lon_max,  nargout=1)
             if (DOP_rate >= self.DOP_thres):
                 try:
-                    coverage_rate = eng.cal_coverage_rate_dipole_northern(lats, lons, nargout=1)
+                    actions_list = self.historical_action.astype(int).tolist()
+                    coverage_rate = self.coverage_compute.compute_coverage(actions_list)
+                    # coverage_rate = eng.cal_coverage_rate_dipole_northern(lats, lons, nargout=1)
                 except:
                     print("無法計算覆蓋率，覆蓋率設定為0")
                     coverage_rate = 0
             else:
                 coverage_rate = 0
 
-            print("save txt => DOP_rate = {}, coverage_rate = {}".format(DOP_rate, coverage_rate))
+            print("save txt => BS_loc = [{}, {}, {}, {}], DOP_rate = {}, coverage_rate = {}".format(self.historical_action[0],
+                                                                                                    self.historical_action[1],
+                                                                                                    self.historical_action[2],
+                                                                                                    self.historical_action[3],
+                                                                                                    DOP_rate,
+                                                                                                    coverage_rate))
             # record pureMCTS simulation results
             f = open('simulation_result/' + self.dir_name + '/coverage_result.txt', 'a')
             f.write(str(DOP_rate) + "\\\\" + str(coverage_rate) + "\\\\" + str(lats) + str(lons) + '\n')

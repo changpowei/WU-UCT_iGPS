@@ -213,7 +213,7 @@ class WU_UCTnode():
     def categorical(pvals):
         num = np.random.random()
         for i in range(pvals.size):
-            if num < pvals[i]:
+            if num < pvals[i] and pvals[i] != 0:
                 return i
             else:
                 num -= pvals[i]

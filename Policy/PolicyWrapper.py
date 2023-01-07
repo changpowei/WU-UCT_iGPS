@@ -59,12 +59,12 @@ class PolicyWrapper():
 
         elif self.policy_name == "Modify_Random":
             moved_index = np.zeros([self.action_n], dtype=np.float32)
-            for i in range(state.shape[0] - 1, 0, -1):
-                if state[i].any():
-                    moved_action = np.where(state[i] == 1)
-                    for j in range(moved_action[0].size):
-                        moved_index[moved_action[0][j] * state.shape[1] + moved_action[1][j]] = 1
-                    break
+
+            if state[1].any():
+                moved_action = np.where(state[1] == 1)
+                for j in range(moved_action[0].size):
+                    moved_index[moved_action[0][j] * state.shape[1] + moved_action[1][j]] = 1
+
             while True:
                 action = random.randint(0, self.action_n - 1)
                 if moved_index[action] != 1:
@@ -92,17 +92,14 @@ class PolicyWrapper():
 
         elif self.policy_name == "Modify_Random":
 
-            percentage = np.ones([self.action_n], dtype=np.float32)
+            percentage = np.ones([self.action_n], dtype=np.float32) / np.count_nonzero(state[1] == 0)
 
-            for i in range(state.shape[0] - 1, 0, -1):
-                if state[i].any():
-                    percentage = percentage / (self.action_n - i)
-                    moved_action = np.where(state[i] == 1)
-                    for j in range(moved_action[0].size):
-                        percentage[moved_action[0][j] * state.shape[1] + moved_action[1][j]] = 0
-                    return percentage
+            base_loc = [index for index, number in enumerate(state[1].tolist()[0]) if number == 1]
 
-            return percentage / self.action_n
+            for i in base_loc:
+                percentage[i] = 0
+
+            return percentage
         else:
             raise NotImplementedError()
 
